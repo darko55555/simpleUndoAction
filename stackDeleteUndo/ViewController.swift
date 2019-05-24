@@ -16,6 +16,7 @@ class ViewController: UIViewController {
     var deletedItemsStack = DeletedItemsStack()
     
     let undoBtn = UIButton()
+    var undoTimer:Timer?
     
     func configureUndoButton(){
         self.tableView.addSubview(undoBtn)
@@ -45,14 +46,9 @@ class ViewController: UIViewController {
     
  
     func showUndoButton(){
-        
         if !undoBtn.isHidden { return }
-        
         self.undoBtn.isHidden = false
-
-        Timer.scheduledTimer(withTimeInterval: 4, repeats: false, block: {_ in
-            self.undoBtn.isHidden = true
-        })
+        resetUndoTimer()
     }
     
     @objc
@@ -60,8 +56,15 @@ class ViewController: UIViewController {
         guard let lastDeletedItem = deletedItemsStack.pop() else { return }
         products.insert(lastDeletedItem.name, at: lastDeletedItem.index)
         tableView.reloadData()
+        resetUndoTimer()
     }
     
+    func resetUndoTimer(){
+        undoTimer?.invalidate()
+        undoTimer = Timer.scheduledTimer(withTimeInterval: 4, repeats: false, block: {_ in
+            self.undoBtn.isHidden = true
+        })
+    }
 
 
 }
